@@ -1,0 +1,76 @@
+# Import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load dataset
+df = pd.read_excel('02-Churn-Dataset.xlsx')  
+
+# Initial data inspection
+
+# View first few rows
+print(df.head())
+
+# Dataset shape
+print("Dataset shape:", df.shape)
+
+# Data types and missing values
+print(df.info())
+print(df.isnull().sum())
+
+# Data cleaning
+
+# Convert 'TotalCharges' to numeric, coerce errors to NaN
+df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
+
+# Drop rows with missing 'TotalCharges'
+df.dropna(subset=['TotalCharges'], inplace=True)
+
+# Reset index after dropping rows
+df.reset_index(drop=True, inplace=True)
+
+# Univariate analysis
+
+# Churn count plot
+sns.countplot(x='Churn', data=df)
+plt.title('Churn Distribution')
+plt.show()
+
+# Churn percentage
+churn_rate = df['Churn'].value_counts(normalize=True) * 100
+print("Churn Rate:\n", churn_rate)
+
+# Histograms for numerical features
+numerical_features = ['tenure', 'MonthlyCharges', 'TotalCharges']
+df[numerical_features].hist(bins=30, figsize=(10, 7))
+plt.tight_layout()
+plt.show()
+
+# Bivariate analysis
+# Churn versus Categorical Features
+# List of categorical features
+categorical_features = ['gender', 'SeniorCitizen', 'Partner', 'Dependents',
+                        'PhoneService', 'MultipleLines', 'InternetService',
+                        'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
+                        'TechSupport', 'StreamingTV', 'StreamingMovies',
+                        'Contract', 'PaperlessBilling', 'PaymentMethod']
+
+# Plot count plots for each categorical feature against Churn
+for feature in categorical_features:
+    plt.figure(figsize=(6, 4))
+    sns.countplot(x=feature, hue='Churn', data=df)
+    plt.title(f'Churn by {feature}')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+# Churn versus Numerical Features
+# Boxplots for numerical features against Churn
+for feature in numerical_features:
+    plt.figure(figsize=(6, 4))
+    sns.boxplot(x='Churn', y=feature, data=df)
+    plt.title(f'{feature} by Churn')
+    plt.tight_layout()
+    plt.show()
+
+
